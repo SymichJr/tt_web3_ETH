@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class Token(models.Model):
     id = models.AutoField(primary_key=True)
     unique_hash = models.CharField(max_length=255, unique=True)

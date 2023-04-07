@@ -4,21 +4,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Token',
+            name="Token",
             fields=[
-                ('id', models.AutoField(primary_key=True, serialize=False)),
-                ('unique_hash', models.CharField(max_length=255, unique=True)),
-                ('tx_hash', models.CharField(max_length=255)),
-                ('media_url', models.URLField()),
-                ('owner', models.CharField(max_length=42)),
+                ("id", models.AutoField(primary_key=True, serialize=False)),
+                ("unique_hash", models.CharField(max_length=255, unique=True)),
+                ("tx_hash", models.CharField(max_length=255)),
+                ("media_url", models.URLField()),
+                ("owner", models.CharField(max_length=42)),
             ],
         ),
     ]
