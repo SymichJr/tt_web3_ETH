@@ -52,13 +52,12 @@ class TokenCreateView(APIView):
             'chainId': 5,
             'nonce': nonce,
             'gasPrice': gas_price_gwei,
-            'gas': 1000000000,
+            'gas': 4000000,
         })
         sign_txn = web3.eth.account.sign_transaction(mint_method, private_key=PRIVATE_KEY)
-        tx_hash = sign_txn.hash
-        token.tx_hash = tx_hash
+        tx_hash = web3.eth.send_raw_transaction(sign_txn.rawTransaction)
+        token.tx_hash = web3.to_hex(tx_hash)
         token.save()
-        web3.eth.send_raw_transaction(sign_txn.rawTransaction)
         serializer = TokenSerializer(token)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
