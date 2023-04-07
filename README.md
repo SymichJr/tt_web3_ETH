@@ -1,7 +1,7 @@
 # tt_web3_ETH
 A backend service that interacts with an ERC-721 contract on the Ethereum blockchain
 
-### Установка
+### Install
 Clone the project to the local machine, install the virtual environment and run it
 
 Install all dependencies from a file ```requirements.txt```
