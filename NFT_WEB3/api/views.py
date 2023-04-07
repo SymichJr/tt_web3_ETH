@@ -14,6 +14,7 @@ from constants import LEN_RANDOM_STRING
 
 from .serializers import TokenSerializer
 from .string_generator import generate_random_string
+from .pagination import StandardPagination
 
 load_dotenv()
 
@@ -63,6 +64,7 @@ class TokenCreateView(APIView):
 
 
 class TokenListView(APIView):
+    pagination_class = StandardPagination
     def get(self, request):
         tokens = Token.objects.all()
         serializer = TokenSerializer(tokens, many=True)
