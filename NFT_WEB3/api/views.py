@@ -7,10 +7,59 @@ from rest_framework.response import Response
 from web3 import Web3, HTTPProvider
 from web3.middleware import geth_poa_middleware
 
-from nft_token.models import Token
+from dotenv import load_dotenv
 
+from nft_token.models import Token
+from constants import LEN_RANDOM_STRING
 
 from .serializers import TokenSerializer
+from .string_generator import generate_random_string
+
+load_dotenv()
+
+PRIVATE_KEY = os.getenv('PRIVATE_KEY')
+ETH_NODE_URL = os.getenv('ETH_NODE_URL')
+FROM_ADDRESS = os.getenv('FROM_ADDRESS')
+CONTRACT_ADDRESS = os.getenv('CONTRACT_ADDRESS')
+
+
+class TokenCreateView(APIView):
+    def post(self, request):
+        data = request.data
+        media_url = data.get['media_url']
+        owner = data.get['owner']
+        unique_hash = generate_random_string(LEN_RANDOM_STRING)
+        token = Token.objects.create(
+            media_url=media_url,
+            owner=owner,
+            unique_hash=unique_hash
+        )
+        web3 = Web3(HTTPProvider(ETH_NODE_URL))
+        web3.middleware_onion.inject(geth_poa_middleware, layer=0)
+        contract_address = CONTRACT_ADDRESS
+        with open('abi.json') as file:
+            contract_abi = json.load(file)
+        contract = web3.eth.contract(address=contract_address, abi=contract_abi)
+        nonce = web3.eth.get_transaction_count(FROM_ADDRESS)
+        gas_price = web3.eth.gas_price
+        gas_price_gwei = web3.from_wei(gas_price, 'gwei')
+        mint_method = contract.functions.mint(
+            token.owner,
+            token.unique_hash,
+            token.media_url
+        ).build_transaction({
+            'chainId': 5,
+            'nonce': nonce,
+            'gasPrice': gas_price_gwei,
+            'gas': 1000000000,
+        })
+        sign_txn = web3.eth.account.sign_transaction(mint_method, private_key=PRIVATE_KEY)
+        tx_hash = sign_txn.hash
+        token.tx_hash = tx_hash
+        token.save()
+        web3.eth.send_raw_transaction(sign_txn.rawTransaction)
+        serializer = TokenSerializer(token)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class TokenListView(APIView):
