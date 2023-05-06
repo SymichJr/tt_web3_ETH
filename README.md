@@ -1,4 +1,4 @@
-# tt_web3_ETH
+# web3_ETH
 A backend service that interacts with an ERC-721 contract on the Ethereum blockchain
 
 ### Install
